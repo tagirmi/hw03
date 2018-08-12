@@ -4,9 +4,9 @@
 #include <new>
 #include <utility>
 
-namespace my {
+namespace hw03 {
 
-template<typename T>
+template<typename T, std::size_t N>
 struct allocator {
     using value_type = T;
     using pointer = T*;
@@ -16,14 +16,14 @@ struct allocator {
 
     template<typename U>
     struct rebind {
-        using other = allocator<U>;
+        using other = allocator<U, N>;
     };
 
     allocator() = default;
     ~allocator() = default;
 
     template<typename U>
-    allocator(const allocator<U>&)
+    allocator(const allocator<U, N>&)
     {
     }
 
@@ -52,4 +52,4 @@ struct allocator {
     }
 };
 
-} // namespace my
+} // namespace hw03
