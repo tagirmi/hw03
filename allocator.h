@@ -34,7 +34,7 @@ public:
 
   void* get_mem(size_t n)
   {
-    if (n + m_index < BlockCount) {
+    if (n + m_index <= BlockCount) {
       auto ptr = m_mem + m_index * BlockSize;
       m_index += n;
       return ptr;

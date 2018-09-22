@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <map>
 
@@ -32,14 +33,16 @@ std::map<int, int, std::less<int>, hw03::allocator<std::pair<int, int>, elements
 int main(int argc, char const *argv[])
 {
   try {
+    auto mapGenerator = [i = 0] () mutable {
+      auto f = factorial(i);
+      return std::make_pair(i++, f);
+    };
 
     StdMap stdMap;
-    for (int i = 0; i < elementsCount; ++i)
-      stdMap.insert(std::make_pair(i, factorial(i)));
+    std::generate_n(std::inserter(stdMap, stdMap.begin()), elementsCount, mapGenerator);
 
     CustomAllocatorMap customAllocatorMap;
-    for (int i = 0; i < elementsCount; ++i)
-      customAllocatorMap.insert(std::make_pair(i, factorial(i)));
+    std::generate_n(std::inserter(customAllocatorMap, customAllocatorMap.begin()), elementsCount, mapGenerator);
 
     std::cout << "std::map: " << std::endl;
     printMap(stdMap);
