@@ -15,18 +15,20 @@ constexpr T factorial(T n)
   return (n <= 1) ? 1 : n * factorial(n - 1);
 }
 
-template<typename T>
-void printMap(const T& map)
+template<typename ...Args>
+std::ostream& operator<<(std::ostream& stream, const std::map<Args...>& map)
 {
   for (const auto& i : map)
-    std::cout << i.first << ' ' << i.second << std::endl;
+    stream << i.first << ' ' << i.second << std::endl;
+  return stream;
 }
 
-template<typename T>
-void printContainer(const T& container)
+template<typename ...Args>
+std::ostream& operator<<(std::ostream& stream, const hw03::forward_list<Args...>& container)
 {
   for (const auto& i : container)
-    std::cout << i << std::endl;
+    stream << i << std::endl;
+  return stream;
 }
 
 constexpr size_t elementsCount = 10;
@@ -52,10 +54,7 @@ void testStdMap()
 {
   std::map<int, int> map;
   fillMap(map);
-
-  std::cout << "std::map: " << std::endl;
-  printMap(map);
-  std::cout <<std::endl;
+  std::cout << "std::map: " << std::endl << map << std::endl;
 }
 
 void testCustomAllocatorMap()
@@ -64,20 +63,14 @@ void testCustomAllocatorMap()
 
   Map map;
   fillMap(map);
-
-  std::cout << "std::map with custom allocator: " << std::endl;
-  printMap(map);
-  std::cout <<std::endl;
+  std::cout << "std::map with custom allocator: " << std::endl << map << std::endl;
 }
 
 void testCustomContainer()
 {
   hw03::forward_list<int> container;
   fillContainer(container);
-
-  std::cout << "custom container: " << std::endl;
-  printContainer(container);
-  std::cout <<std::endl;
+  std::cout << "custom container: " << std::endl << container << std::endl;
 }
 
 void testCustomContainerWithCustomAllocator()
@@ -86,10 +79,7 @@ void testCustomContainerWithCustomAllocator()
 
   CustomAllocatorAndContainer container;
   fillContainer(container);
-
-  std::cout << "custom container with custom allocator: " << std::endl;
-  printContainer(container);
-  std::cout <<std::endl;
+  std::cout << "custom container with custom allocator: " << std::endl << container << std::endl;
 }
 
 } // namespace

@@ -25,18 +25,16 @@ template<typename T, typename Allocator = std::allocator<T>>
 class forward_list
 {
 public:
+  using allocator_t = typename Allocator::template rebind<details::node<T>>::other;
+
   forward_list()
-    : m_head{}
+    : m_head{nullptr}
+    , m_tail{nullptr}
   {
   }
   ~forward_list()
   {
-    while (m_head) {
-      auto p = m_head;
-      m_head = m_head->next;
-      m_allocator.destroy(p);
-      m_allocator.deallocate(p, 1);
-    }
+    clear();
   }
 
   struct NodeIterator : std::iterator<std::forward_iterator_tag, T>
@@ -59,12 +57,12 @@ public:
       return m_ptr->data;
     }
 
-    bool operator==(NodeIterator& other)
+    bool operator==(const NodeIterator& other) const
     {
       return m_ptr == other.m_ptr;
     }
 
-    bool operator!=(NodeIterator& other)
+    bool operator!=(const NodeIterator& other) const
     {
       return !(*this == other);
     }
@@ -110,11 +108,20 @@ public:
     m_tail->next = nullptr;
   }
 
+  void clear()
+  {
+    while (m_head) {
+      auto p = m_head;
+      m_head = m_head->next;
+      m_allocator.destroy(p);
+      m_allocator.deallocate(p, 1);
+    }
+    m_tail = m_head;
+  }
+
 private:
   details::node<T>* m_head;
   details::node<T>* m_tail;
-
-  using allocator_t = typename Allocator::template rebind<details::node<T>>::other;
   allocator_t m_allocator;
 };
 
