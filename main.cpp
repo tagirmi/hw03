@@ -3,6 +3,7 @@
 #include <map>
 
 #include "allocator.h"
+#include "container.h"
 
 namespace {
 
@@ -21,35 +22,85 @@ void printMap(const T& map)
     std::cout << i.first << ' ' << i.second << std::endl;
 }
 
-constexpr size_t elementsCount = 10;
-
+template<typename T>
+void printContainer(const T& container)
+{
+  for (const auto& i : container)
+    std::cout << i << std::endl;
 }
 
-using StdMap = std::map<int, int>;
+constexpr size_t elementsCount = 10;
 
-using CustomAllocatorMap =
-std::map<int, int, std::less<int>, hw03::allocator<std::pair<int, int>, elementsCount>>;
+template<typename T>
+void fillMap(T& map)
+{
+  auto generator = [i = 0] () mutable {
+    auto f = factorial(i);
+    return std::make_pair(i++, f);
+  };
+  std::generate_n(std::inserter(map, std::begin(map)), elementsCount, generator);
+}
+
+template<typename T>
+void fillContainer(T& container)
+{
+  for (size_t i = 0; i < elementsCount; ++i)
+    container.push_back(i);
+}
+
+void testStdMap()
+{
+  std::map<int, int> map;
+  fillMap(map);
+
+  std::cout << "std::map: " << std::endl;
+  printMap(map);
+  std::cout <<std::endl;
+}
+
+void testCustomAllocatorMap()
+{
+  using Map = std::map<int, int, std::less<int>, hw03::allocator<std::pair<int, int>, elementsCount>>;
+
+  Map map;
+  fillMap(map);
+
+  std::cout << "std::map with custom allocator: " << std::endl;
+  printMap(map);
+  std::cout <<std::endl;
+}
+
+void testCustomContainer()
+{
+  hw03::forward_list<int> container;
+  fillContainer(container);
+
+  std::cout << "custom container: " << std::endl;
+  printContainer(container);
+  std::cout <<std::endl;
+}
+
+void testCustomContainerWithCustomAllocator()
+{
+  using CustomAllocatorAndContainer = hw03::forward_list<int, hw03::allocator<int, elementsCount>>;
+
+  CustomAllocatorAndContainer container;
+  fillContainer(container);
+
+  std::cout << "custom container with custom allocator: " << std::endl;
+  printContainer(container);
+  std::cout <<std::endl;
+}
+
+} // namespace
 
 int main(int argc, char const *argv[])
 {
   try {
-    auto mapGenerator = [i = 0] () mutable {
-      auto f = factorial(i);
-      return std::make_pair(i++, f);
-    };
-
-    StdMap stdMap;
-    std::generate_n(std::inserter(stdMap, stdMap.begin()), elementsCount, mapGenerator);
-
-    CustomAllocatorMap customAllocatorMap;
-    std::generate_n(std::inserter(customAllocatorMap, customAllocatorMap.begin()), elementsCount, mapGenerator);
-
-    std::cout << "std::map: " << std::endl;
-    printMap(stdMap);
-
-    std::cout <<std::endl;
-    std::cout << "std::map with custom allocator: " << std::endl;
-    printMap(customAllocatorMap);
+    testStdMap();
+    testCustomAllocatorMap();
+    testCustomContainer();
+    testCustomContainerWithCustomAllocator();
   }
   catch(const std::exception& e) {
     std::cerr << e.what() << std::endl;
