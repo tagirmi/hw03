@@ -1,0 +1,6 @@
+language: cpp
+
+script:
+  - cmake .
+  - cmake --build .
+  - cmake --build . --target package
